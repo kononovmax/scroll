@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Phone Battery Demo</title>
+		<style>
+			:root {
+				--phone-w: 360px;
+				--phone-h: 800px;
+				--bg: #0f1115;
+				--frame: #1e2126;
+				--accent: #e63946;
+				--accent-deep: #9b1a1a;
+			}
+
+			body {
+				margin: 0;
+				height: 100vh;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: linear-gradient(180deg, #060608, #0b0c0e);
+				font-family: Inter, Arial, sans-serif;
+				color: #fff;
+				overflow: hidden;
+			}
+
+			/* Корпус телефона */
+			.phone {
+				width: var(--phone-w);
+				height: var(--phone-h);
+				background: #1b1b22;
+				border-radius: 24px;
+				border: 8px solid rgba(255, 255, 255, 0.08);
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+				position: relative;
+				z-index: 1;
+			}
+
+			.status-bar {
+				height: 40px;
+			}
+
+			.nav-bar {
+				height: 52px;
+			}
+
+			.view {
+				background-color: #0d0d11;
+				border: 1px solid rgba(255, 255, 255, 0.16);
+				height: 100%;
+				border-radius: 24px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+				position: relative;
+			}
+
+			/* Фон с пульсацией */
+			.bg-ellipse {
+				background: rgba(242, 42, 65, 0.6);
+				filter: blur(200px);
+
+				position: absolute;
+				left: 50%;
+				width: 600px;
+				height: 600px;
+				top: -100px;
+
+				border-radius: 50%;
+				transform: translate(-50%, -50%);
+				animation: pulse 5s ease-in-out infinite;
+				z-index: 0;
+			}
+			@keyframes pulse {
+				0%,
+				100% {
+					transform: translate(-50%, -50%) scale(1);
+				}
+				50% {
+					transform: translate(-50%, -50%) scale(1.5);
+				}
+			}
+
+			/* Батарея */
+			.battery-wrap {
+				width: 168px;
+				height: 320px;
+				border-radius: 32px;
+				border: 8px solid rgb(255, 255, 255, 0.3);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: relative;
+				overflow: hidden;
+				background-color: #0b0c0e;
+			}
+			.battery-overlay {
+				position: absolute;
+				width: 168px;
+				height: 320px;
+				z-index: 2;
+
+				background: linear-gradient(
+					270deg,
+					rgba(255, 255, 255, 0.24) 0%,
+					rgba(255, 255, 255, 0.16) 16%,
+					rgba(255, 255, 255, 0.112) 40%,
+					rgba(255, 255, 255, 0.112) 60%,
+					rgba(255, 255, 255, 0.16) 84%,
+					rgba(255, 255, 255, 0.24) 100%
+				);
+			}
+			.battery {
+				position: absolute;
+				z-index: 1;
+				width: 168px;
+				height: 320px;
+			}
+
+			.battery-cap {
+				/* Rectangle 1938 */
+
+				position: absolute;
+				width: 64px;
+				height: 12px;
+				left: calc(50% - 64px / 2);
+				top: 177px;
+				background: rgba(255, 255, 255, 0.4);
+				border-radius: 12px 12px 0px 0px;
+			}
+
+			.layer {
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				display: block;
+			}
+
+			.layer .fill {
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				height: 100%;
+			}
+			.layer.red .fill {
+				background: linear-gradient(
+					180deg,
+					#f22a41 0%,
+					#f22a41 30%,
+					#8c1826 100%
+				);
+			}
+			.layer.dark .fill {
+				background: #9a091a;
+			}
+
+			/* Волны */
+			.oval-left,
+			.oval-right {
+				position: absolute;
+
+				/* top: -20px; */
+				pointer-events: none;
+			}
+
+			.oval-left {
+				top: -5px;
+				height: 40px; /* узкая высота */
+				clip-path: ellipse(80% 50% at 50% 50%);
+			}
+
+			.oval-right {
+				top: -36px;
+				height: 40px;
+				clip-path: ellipse(75% 50% at 50% 50%);
+			}
+
+			.layer.red .oval-left {
+				left: 0;
+				width: 96px;
+			}
+
+			.layer.red .oval-right {
+				right: 0;
+				width: 72px;
+				/* background: #0b0c0e; */
+			}
+
+			.layer.dark .oval-right {
+				left: 0;
+				width: 72px;
+				background: #0b0c0e;
+			}
+
+			.layer.dark .oval-left {
+				right: 0;
+				width: 96px;
+				background: #0b0c0e;
+			}
+
+			.layer.red .oval-right {
+				background: #9a091a;
+			}
+
+			.oval-left .inner {
+				position: absolute;
+				inset: 0;
+				border-radius: 50%;
+				background: inherit;
+			}
+			.layer.red .oval-left,
+			.layer.red .oval-left .inner {
+				background: #f22a41;
+			}
+			.layer.dark .oval-left,
+			.layer.dark .oval-left .inner {
+				background: #9a091a;
+			}
+
+			/* Анимации */
+			.layer.red {
+				animation: moveRed 3.6s ease-in-out infinite;
+			}
+			.layer.dark {
+				animation: moveDark 3.6s ease-in-out infinite;
+			}
+			@keyframes moveDark {
+				0%,
+				100% {
+					height: 65%;
+				}
+				25% {
+					height: 58%;
+				}
+				50% {
+					height: 64%;
+				}
+				75% {
+					height: 56%;
+				}
+			}
+			@keyframes moveRed {
+				0%,
+				100% {
+					height: 45%;
+				}
+				25% {
+					height: 40%;
+				}
+				50% {
+					height: 50%;
+				}
+				75% {
+					height: 42%;
+				}
+			}
+
+			.oval-left,
+			.oval-right {
+				animation: ovalPulse 3.6s ease-in-out infinite;
+			}
+			.layer.dark .oval-left,
+			.layer.dark .oval-right {
+				animation-delay: 0.18s;
+			}
+			@keyframes ovalPulse {
+				0%,
+				100% {
+					transform: scaleY(1);
+				}
+				50% {
+					transform: scaleY(1);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="phone">
+			<div class="status-bar"></div>
+
+			<div class="view">
+				<div class="bg-ellipse"></div>
+
+				<div class="battery-cap"></div>
+				<div class="battery-wrap">
+					<div class="battery-overlay"></div>
+					<div class="battery">
+						<div class="layer dark" style="z-index: 2">
+							<div class="fill"></div>
+							<div class="oval-left">
+								<div class="inner"></div>
+							</div>
+							<div class="oval-right"></div>
+						</div>
+						<div class="layer red" style="z-index: 3">
+							<div class="fill"></div>
+							<div class="oval-left">
+								<div class="inner"></div>
+							</div>
+							<div class="oval-right"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="nav-bar"></div>
+		</div>
+		<script>
+			// (function () {
+			// 	document.querySelectorAll(".layer").forEach((el) => {
+			// 		const delay = (Math.random() * 0.6 - 0.3).toFixed(2) + "s";
+			// 		el.style.animationDelay = delay;
+			// 		el.querySelectorAll(".oval-left,.oval-right").forEach(
+			// 			(o) => (o.style.animationDelay = delay)
+			// 		);
+			// 	});
+			// })();
+		</script>
+	</body>
+</html>
